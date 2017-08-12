@@ -1,4 +1,5 @@
-﻿using SurreilyWadLumpLibrary.Lumps;
+﻿using SurreilyWadLumpLibrary.File.LumpLoader;
+using SurreilyWadLumpLibrary.Lumps;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +13,23 @@ namespace SurreilyWadLumpLibrary.File
     public class WadManager
     {
 
-        public static Wad Load(string path)
+        
+
+        protected IList<ILumpLoader> _loaders { get; set; }
+
+        public WadManager()
+        {
+
+            // Initialize the loaders list.
+            this._loaders = new List<ILumpLoader>();
+
+            // Populate the loaders list with default loaders.
+            this._loaders.Add(new MapLumpLoader());
+            this._loaders.Add(new UnknownLumpLoader());
+
+        }
+
+        public Wad Load(string path)
         {
 
             // Begin a file stream.
@@ -42,23 +59,49 @@ namespace SurreilyWadLumpLibrary.File
                     
                 }
 
-                // Iterate through the directory.
+                // Move the reader's position to the directory.
                 reader.BaseStream.Position = directoryOffset;
-                for (int index=0; index<directoryCount; index++)
+
+                // Read the directory.
+                IList<DirectoryEntry> directory = new List<DirectoryEntry>();
+                for (int index = 0; index < directoryCount; index++)
                 {
 
-                    // Read lump information.
-                    int lumpOffset = reader.ReadInt32();
-                    int lumpSize = reader.ReadInt32();
-                    string name = System.Text.Encoding.UTF8.GetString(
-                        reader.ReadBytes(8)).TrimEnd('\0');
-
-                    // Add the lump.
-                    wad.Lumps.Add(new MarkerLump(name));
+                    // Read the lump offset, the lump size, and the lump's name
+                    // (in that order) and store it in the directory.
+                    directory.Add(new DirectoryEntry(
+                        reader.ReadInt32(),
+                        reader.ReadInt32(),
+                        System.Text.Encoding.UTF8.GetString(
+                        reader.ReadBytes(8)).TrimEnd('\0')
+                    ));
 
                 }
 
-                // Return the complete WAD file.
+                // Add a null entry in the directory, purely to prevent us
+                // going out of bounds or having to check for it every time.
+                directory.Add(null);
+
+                // Go over the directory again, this time loading lumps.
+                for (int index = 0; index < directoryCount; index++)
+                {
+
+                    // Jump to the lump offset.
+                    reader.BaseStream.Position = directory[index].Offset;
+
+                    // Load the correct lump type.
+                    foreach (ILumpLoader loader in this._loaders)
+                    {
+                        if (loader.CanLoad(reader, directory[index], directory[index+1]))
+                        {
+                            wad.Lumps.Add(loader.Load(reader, directory[index]));
+                            break;
+                        }
+                    }
+
+                }
+
+                // Return the complete WAD.
                 return wad;
 
             }

@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lump.cs" />
-    <Compile Include="Lumps\Maps\MapLump.cs" />
+    <Compile Include="Lumps\MapLump.cs" />
     <Compile Include="Lumps\MarkerLump.cs" />
     <Compile Include="Lumps\UnknownLump.cs" />
     <Compile Include="Wad.cs" />

@@ -18,14 +18,14 @@ namespace SurreilyWadLumpLibrary.Test.File
         public void Wads_Can_Be_Loaded()
         {
 
-            // Load a WAD.
-            Wad wad = WadManager.Load(@"TestData\testmap.wad");
+            // Load a WAD
+            Wad wad = new WadManager().Load(@"TestData\testmap.wad");
             Assert.IsNotNull(wad);
 
-            // WAD has the correct type.
+            // Is the WAD the correct type?
             Assert.AreEqual(WadType.Pwad, wad.Type);
 
-            // WAD has the correct number of lumps.
+            // Does the WAD have the correct number of lumps?
             Assert.AreEqual(11, wad.Lumps.Count);
 
         }
@@ -35,10 +35,10 @@ namespace SurreilyWadLumpLibrary.Test.File
         {
 
             // Load a WAD.
-            Wad wad = WadManager.Load(@"TestData\testmap.wad");
+            Wad wad = new WadManager().Load(@"TestData\testmap.wad");
             Assert.IsNotNull(wad);
 
-            // The lumps are all correctly named.
+            // Are all lumps correctly named?
             Assert.AreEqual("MAP01", wad.Lumps[0].Name);
             Assert.AreEqual("THINGS", wad.Lumps[1].Name);
             Assert.AreEqual("LINEDEFS", wad.Lumps[2].Name);
@@ -51,6 +51,17 @@ namespace SurreilyWadLumpLibrary.Test.File
             Assert.AreEqual("REJECT", wad.Lumps[9].Name);
             Assert.AreEqual("BLOCKMAP", wad.Lumps[10].Name);
 
+        }
+
+        [TestMethod]
+        public void Wad_Lumps_Have_The_Correct_Types()
+        {
+            // Load a WAD.
+            Wad wad = new WadManager().Load(@"TestData\testmap.wad");
+            Assert.IsNotNull(wad);
+
+            // Are all lumps the correct type?
+            Assert.AreEqual(LumpType.Map, wad.Lumps[0].Type);
         }
 
     }

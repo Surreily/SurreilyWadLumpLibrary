@@ -40,6 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DirectoryEntry.cs" />
+    <Compile Include="LumpLoader\ILumpLoader.cs" />
+    <Compile Include="LumpLoader\MapLumpLoader.cs" />
+    <Compile Include="LumpLoader\UnknownLumpLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WadManager.cs" />
   </ItemGroup>
